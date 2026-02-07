@@ -42,7 +42,6 @@ def dataCheck(targets, check):
                     bins[target][0] += 1
                     bins[target][1] += float(row["final_gpa"])
 
-        print(bins)
         for i in range(len(targets)):
             if bins[i][1] != 0 and bins[i][0] != 0:
                 print(
@@ -53,40 +52,6 @@ def dataCheck(targets, check):
                 )
             else:
                 print("the target", targets[i], "has no members")
-
-
-def age():
-    # Open the CSV file in read mode
-    # The file needs to be opened inside the functions, mainly, because of the scoping rules behind the with operator
-    # you can do it without but, thats mroe effort that I want to put in.
-    with open("student_academic_performance_1M.csv", mode="r") as file:
-        # Create a CSV reader object
-        # we will do 18> 18-19, 20-22, 22-25,26+
-        bins = [[0, 0.0], [0, 0.0], [0, 0.0], [0, 0.0], [0, 0.0]]
-        results = [0, 0, 0, 0, 0]
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            if float(row["age"]) < 18:
-                bins[0][0] += 1
-                bins[0][1] += float(row["final_gpa"])
-            elif float(row["age"]) <= 19:
-                bins[1][0] += 1
-                bins[1][1] += float(row["final_gpa"])
-            elif float(row["age"]) <= 22:
-                bins[2][0] += 1
-                bins[2][1] += float(row["final_gpa"])
-            elif float(row["age"]) >= 25:
-                bins[3][0] += 1
-                bins[3][1] += float(row["final_gpa"])
-            elif float(row["age"]) >= 26:
-                bins[4][0] += 1
-                bins[4][1] += float(row["final_gpa"])
-
-        for i in range(len(bins) - 1):
-            if bins[i][1] != 0 and bins[i][0] != 0:
-                print("The results for bin ", i, " are ", (bins[i][1] / bins[i][0]))
-            else:
-                print("bin", i, "contains no members ")
 
 
 if __name__ == "__main__":
