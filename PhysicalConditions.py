@@ -3,23 +3,37 @@ import csv
 
 def main():
     print("Hello World!")
-    csv = setup()
-    sleepHours(csv)
+    sleep_hours()
 
 
-def setup():
+def sleep_hours():
     # Open the CSV file in read mode
-    with open("example.csv", mode="r") as file:
+    with open("student_academic_performance_1M.csv", mode="r") as file:
         # Create a CSV reader object
-        csv_reader = csv.reader(file)
+        # we will do 4> 4-6 6-8, 8+
+        bins = [[0, 0.0], [0, 0.0], [0, 0.0], [0, 0.0]]
+        results = [0, 0, 0, 0]
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            if float(row["sleep_hours"]) < 4:
+                bins[0][0] += 1
+                bins[0][1] += float(row["final_gpa"])
+            elif float(row["sleep_hours"]) < 6:
+                bins[1][0] += 1
+                bins[1][1] += float(row["final_gpa"])
+            elif float(row["sleep_hours"]) < 8:
+                bins[2][0] += 1
+                bins[2][1] += float(row["final_gpa"])
+            elif float(row["sleep_hours"]) >= 8:
+                print(float(row["sleep_hours"]))
+                bins[3][0] += 1
+                bins[3][1] += float(row["final_gpa"])
 
         # Skip the header row (if there is one)
         next(csv_reader, None)
-        return csv_reader
-
-
-def sleepHours(csv):
-    filtered_data = [row for row in csv if int(row["sleep_hours"]) > 25]
+        for i in range(4):
+            results[i] = bins[i][1] / bins[i][0]
+        print(results)
 
 
 if __name__ == "__main__":
