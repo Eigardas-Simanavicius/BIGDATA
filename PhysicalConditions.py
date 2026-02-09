@@ -18,8 +18,14 @@ def main():
     elif intake == 2:
         targets = [17, 19, 22, 25, 26]
         check = "age"
+    elif intake == 3:
+        targets = [5, 10, 15, 20, 25, 30, 40, 50]
+        check = "bmi"
+    elif intake == 4:
+        mostImportant()
 
-    dataCheck(targets, check)
+    if intake != 4:
+        dataCheck(targets, check)
 
 
 def dataCheck(targets, check):
@@ -30,7 +36,7 @@ def dataCheck(targets, check):
     with open("student_academic_performance_1M.csv", mode="r") as file:
         # Create a CSV reader object
         # we will do 4> 4-6 6-8, 8+
-        bins = [[0, 0.0] for j in range(len(targets))]
+        bins = [[0, 0.0, 0.0] for j in range(len(targets))]
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             for target in range(len(targets)):
@@ -52,6 +58,47 @@ def dataCheck(targets, check):
                 )
             else:
                 print("the target", targets[i], "has no members")
+
+        print(bins)
+
+
+def mostImportant():
+    # count , sleep_hours,age,bmi
+    bins = [[0, 0.0, 0.0, 0.0] for j in range(5)]
+
+    with open("student_academic_performance_1M.csv", mode="r") as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            if float(row["final_gpa"]) >= 4:
+                bins[0][0] += 1
+                bins[0][1] += float(row["sleep_hours"])
+                bins[0][2] += float(row["age"])
+                bins[0][3] += float(row["bmi"])
+            elif float(row["final_gpa"]) >= 3:
+                bins[1][0] += 1
+                bins[1][1] += float(row["sleep_hours"])
+                bins[1][2] += float(row["age"])
+                bins[1][3] += float(row["bmi"])
+            elif float(row["final_gpa"]) >= 2:
+                bins[2][0] += 1
+                bins[2][1] += float(row["sleep_hours"])
+                bins[2][2] += float(row["age"])
+                bins[2][3] += float(row["bmi"])
+            elif float(row["final_gpa"]) >= 1:
+                bins[3][0] += 1
+                bins[3][1] += float(row["sleep_hours"])
+                bins[3][2] += float(row["age"])
+                bins[3][3] += float(row["bmi"])
+            else:
+                bins[4][0] += 1
+                bins[4][1] += float(row["sleep_hours"])
+                bins[4][2] += float(row["age"])
+                bins[4][3] += float(row["bmi"])
+
+        for x in range(5):
+            for y in range(1, 4):
+                bins[x][y] = bins[x][y] / bins[x][0]
+                print(x, y)
 
 
 if __name__ == "__main__":
