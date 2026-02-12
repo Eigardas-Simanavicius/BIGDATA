@@ -10,22 +10,21 @@ def main():
         input("choose which data set to analyse \n 1. sleep_hours \n 2.Age \n")
     )
     targets = [0]
-    check = ""
+    checkList = ["sleep_hours", "age", "bmi", "physical_activity", "screen_time"]
     if intake == 1:
-        targets = [4, 6, 8, 9]
-        check = "sleep_hours"
-
+        targets = [4, 5, 6, 7, 8, 9]
     elif intake == 2:
         targets = [17, 19, 22, 25, 26]
-        check = "age"
     elif intake == 3:
         targets = [5, 10, 15, 20, 25, 30, 40, 50]
-        check = "bmi"
     elif intake == 4:
-        mostImportant()
-
-    if intake != 4:
-        dataCheck(targets, check)
+        targets = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    elif intake == 5:
+        targets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    elif intake == 10:
+        mostImportant(checkList)
+    if intake != 10:
+        dataCheck(targets, checkList[intake - 1])
 
 
 def dataCheck(targets, check):
@@ -36,13 +35,14 @@ def dataCheck(targets, check):
     with open("student_academic_performance_1M.csv", mode="r") as file:
         # Create a CSV reader object
         # we will do 4> 4-6 6-8, 8+
-        bins = [[0, 0.0, 0.0] for j in range(len(targets))]
+        bins = [[0, 0.0, 0.0, 0.0] for j in range(len(targets))]
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             for target in range(len(targets)):
                 if float(row[check]) <= targets[target]:
                     bins[target][0] += 1
                     bins[target][1] += float(row["final_gpa"])
+                    bins[target][2] += float(row["standardized_exam_score"])
                     break
                 elif target == len(targets) - 1:
                     bins[target][0] += 1
@@ -55,6 +55,8 @@ def dataCheck(targets, check):
                     targets[i],
                     " are ",
                     (bins[i][1] / bins[i][0]),
+                    " and the exam scores are",
+                    (bins[i][2] / bins[i][0]),
                 )
             else:
                 print("the target", targets[i], "has no members")
@@ -62,43 +64,39 @@ def dataCheck(targets, check):
         print(bins)
 
 
-def mostImportant():
+def mostImportant(checkList):
     # count , sleep_hours,age,bmi
-    bins = [[0, 0.0, 0.0, 0.0] for j in range(5)]
+    bins = [[0, 0.0, 0.0, 0.0, 0.0] for j in range(7)]
 
     with open("student_academic_performance_1M.csv", mode="r") as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             if float(row["final_gpa"]) >= 4:
-                bins[0][0] += 1
-                bins[0][1] += float(row["sleep_hours"])
-                bins[0][2] += float(row["age"])
-                bins[0][3] += float(row["bmi"])
+                n = 0
+            elif float(row["final_gpa"]) >= 3.5:
+                n = 1
             elif float(row["final_gpa"]) >= 3:
-                bins[1][0] += 1
-                bins[1][1] += float(row["sleep_hours"])
-                bins[1][2] += float(row["age"])
-                bins[1][3] += float(row["bmi"])
+                n = 2
+            elif float(row["final_gpa"]) >= 2.5:
+                n = 3
             elif float(row["final_gpa"]) >= 2:
-                bins[2][0] += 1
-                bins[2][1] += float(row["sleep_hours"])
-                bins[2][2] += float(row["age"])
-                bins[2][3] += float(row["bmi"])
-            elif float(row["final_gpa"]) >= 1:
-                bins[3][0] += 1
-                bins[3][1] += float(row["sleep_hours"])
-                bins[3][2] += float(row["age"])
-                bins[3][3] += float(row["bmi"])
-            else:
-                bins[4][0] += 1
-                bins[4][1] += float(row["sleep_hours"])
-                bins[4][2] += float(row["age"])
-                bins[4][3] += float(row["bmi"])
+                n = 4
 
-        for x in range(5):
-            for y in range(1, 4):
-                bins[x][y] = bins[x][y] / bins[x][0]
-                print(x, y)
+            elif float(row["final_gpa"]) >= 1:
+                n = 5
+            else:
+                n = 6
+
+            bins[n][0] += 1
+            for x in range(1, len(checkList) + 1):
+                bins[n][x] += float(row[checkList[x - 1]])
+
+        for x in range(7):
+            print("The students with a GPA of ")
+            for y in range(1, len(checkList) + 1):
+                bins[x][y] = round(bins[x][y] / bins[x][0], 2)
+
+        print(bins)
 
 
 if __name__ == "__main__":
