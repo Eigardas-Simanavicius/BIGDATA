@@ -22,7 +22,12 @@ def main():
     elif intake == 5:
         targets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     elif intake == 10:
-        mostImportant(checkList)
+        if intake == 1:
+            check = "final_gpa"
+        else:
+            check = "standardized_exam_score"
+
+        mostImportant(checkList, check)
     if intake != 10:
         dataCheck(targets, checkList[intake - 1])
 
@@ -64,39 +69,48 @@ def dataCheck(targets, check):
         print(bins)
 
 
-def mostImportant(checkList):
+def mostImportant(checkList, check):
     # count , sleep_hours,age,bmi
-    bins = [[0, 0.0, 0.0, 0.0, 0.0] for j in range(7)]
+    if check == "final_gpa":
+        targets = [4, 3.5, 3, 2.5, 2, 1, 0]
+    else:
+        targets = [90, 80, 70, 60, 50, 40, 30, 20, 10, 0]
+
+    bins = [[0, 0.0, 0.0, 0.0, 0.0, 0.0] for j in range(len(targets))]
 
     with open("student_academic_performance_1M.csv", mode="r") as file:
         csv_reader = csv.DictReader(file)
+        n = len(targets) - 1
         for row in csv_reader:
-            if float(row["final_gpa"]) >= 4:
-                n = 0
-            elif float(row["final_gpa"]) >= 3.5:
-                n = 1
-            elif float(row["final_gpa"]) >= 3:
-                n = 2
-            elif float(row["final_gpa"]) >= 2.5:
-                n = 3
-            elif float(row["final_gpa"]) >= 2:
-                n = 4
-
-            elif float(row["final_gpa"]) >= 1:
-                n = 5
-            else:
-                n = 6
+            for x in range(len(targets) + 1):
+                if float(row[check]) >= targets[x]:
+                    n = x
+                    break
 
             bins[n][0] += 1
-            for x in range(1, len(checkList) + 1):
-                bins[n][x] += float(row[checkList[x - 1]])
+            for x in range(len(checkList)):
+                bins[n][x + 1] += float(row[checkList[x]])
 
-        for x in range(7):
-            print("The students with a GPA of ")
-            for y in range(1, len(checkList) + 1):
-                bins[x][y] = round(bins[x][y] / bins[x][0], 2)
+        for x in range(len(targets) - 1):
+            print(
+                "The students with a",
+                check,
+                " of ",
+                targets[x],
+                "or more and their average values are ",
+            )
+            for y in range(len(checkList)):
+                bins[x][y + 1] = round(bins[x][y + 1] / bins[x][0], 2)
+                print(checkList[y], ":", bins[x][y + 1])
 
-        print(bins)
+        intake = (
+            input(
+                "would you like to compare the difference between best and worst students Y/N"
+            )
+        ).lower()
+        if intake == "y":
+            print("todo")
+            # TODO
 
 
 if __name__ == "__main__":
