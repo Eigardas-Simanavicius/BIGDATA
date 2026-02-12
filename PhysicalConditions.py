@@ -22,6 +22,7 @@ def main():
     elif intake == 5:
         targets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     elif intake == 10:
+        intake = int(input("check using 1. Final Gpa, or 2. Exam scores"))
         if intake == 1:
             check = "final_gpa"
         else:
@@ -39,7 +40,6 @@ def dataCheck(targets, check):
 
     with open("student_academic_performance_1M.csv", mode="r") as file:
         # Create a CSV reader object
-        # we will do 4> 4-6 6-8, 8+
         bins = [[0, 0.0, 0.0, 0.0] for j in range(len(targets))]
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
@@ -70,7 +70,6 @@ def dataCheck(targets, check):
 
 
 def mostImportant(checkList, check):
-    # count , sleep_hours,age,bmi
     if check == "final_gpa":
         targets = [4, 3.5, 3, 2.5, 2, 1, 0]
     else:
