@@ -29,6 +29,7 @@ def main():
             check = "standardized_exam_score"
 
         mostImportant(checkList, check)
+        intake = 10
     if intake != 10:
         dataCheck(targets, checkList[intake - 1])
 
@@ -66,8 +67,6 @@ def dataCheck(targets, check):
             else:
                 print("the target", targets[i], "has no members")
 
-        print(bins)
-
 
 def mostImportant(checkList, check):
     if check == "final_gpa":
@@ -90,7 +89,7 @@ def mostImportant(checkList, check):
             for x in range(len(checkList)):
                 bins[n][x + 1] += float(row[checkList[x]])
 
-        for x in range(len(targets) - 1):
+        for x in range(len(targets)):
             print(
                 "The students with a",
                 check,
@@ -107,9 +106,11 @@ def mostImportant(checkList, check):
                 "would you like to compare the difference between best and worst students Y/N"
             )
         ).lower()
+
         if intake == "y":
-            print("todo")
-            # TODO
+            print("the average best student vs worst student looks like this \n")
+            for y in range(len(checkList)):
+                print(checkList[y], ":", bins[0][y + 1] - bins[len(bins) - 1][y + 1])
 
 
 if __name__ == "__main__":
