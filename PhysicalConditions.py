@@ -109,7 +109,6 @@ def mostImportant(checkList, check):
     with open("student_academic_performance_1M.csv", mode="r") as file:
         csv_reader = csv.DictReader(file)
         n = len(targets) - 1
-        print(len(targets))
         for row in csv_reader:
             for x in range(len(targets)):
                 if float(row[check]) >= targets[x]:
@@ -118,9 +117,7 @@ def mostImportant(checkList, check):
 
             bins[n][0] += 1
             for x in range(len(checkList)):
-                if checkList[x] == "illness_days":
-                    print(row[checkList[x]])
-                bins[n][x] += float(row[checkList[x]])
+                bins[n][x + 1] += float(row[checkList[x]])
 
         for x in range(len(targets)):
             print(
@@ -134,13 +131,12 @@ def mostImportant(checkList, check):
                 if bins[x][0] != 0:
                     bins[x][y + 1] = round(bins[x][y + 1] / bins[x][0], 2)
                 print(checkList[y], ":", bins[x][y + 1])
-
         intake = (
             input(
                 "would you like to compare the difference between best and worst students Y/N"
             )
         ).lower()
-
+        print(bins)
         if intake == "y":
             print("the average best student vs worst student looks like this \n")
             for y in range(len(checkList)):
