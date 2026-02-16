@@ -7,31 +7,52 @@ import csv
 # and obviosuly your first bin will include anything smaller than it aswell
 def main():
     intake = int(
-        input("choose which data set to analyse \n 1. sleep_hours \n 2.Age \n")
+        input(
+            "choose which data set to analyse \n 1. sleep_hours \n 2.Age \n 3.Bmi \n 4.physical activity \n 5.Screen time \n 6.stress index \n 7.mental stree \n 8.sleep quality \n 9.illness_days \n 10. All"
+        )
     )
-    targets = [0]
-    checkList = ["sleep_hours", "age", "bmi", "physical_activity", "screen_time"]
-    if intake == 1:
-        targets = [4, 5, 6, 7, 8, 9]
-    elif intake == 2:
-        targets = [17, 19, 22, 25, 26]
-    elif intake == 3:
-        targets = [5, 10, 15, 20, 25, 30, 40, 50]
-    elif intake == 4:
-        targets = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    elif intake == 5:
-        targets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    elif intake == 10:
-        intake = int(input("check using 1. Final Gpa, or 2. Exam scores"))
+    checkList = [
+        "sleep_hours",
+        "age",
+        "bmi",
+        "physical_activity",
+        "screen_time",
+        "stress_index",
+        "mental_stress",
+        "sleep_quality",
+        "illness_days",
+    ]
+    targetList = [
+        [4, 5, 6, 7, 8, 9],
+        [17, 19, 22, 25, 26],
+        [5, 10, 15, 20, 25, 30, 40, 50],
+        [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [2, 4, 6, 8, 10, 12, 14, 16],
+    ]
+
+    if intake == 10:
+        intake = int(
+            input(
+                "check using 1. Final Gpa, 2. Exam scores or 3. Top performers, 4. improvement_next_term"
+            )
+        )
         if intake == 1:
             check = "final_gpa"
+        elif intake == 3:
+            check = "top_performer_flag"
+        elif intake == 4:
+            check = "improvement_next_term"
         else:
             check = "standardized_exam_score"
 
         mostImportant(checkList, check)
         intake = 10
-    if intake != 10:
-        dataCheck(targets, checkList[intake - 1])
+    else:
+        dataCheck(targetList[intake - 1], checkList[intake - 1])
 
 
 def dataCheck(targets, check):
@@ -41,7 +62,7 @@ def dataCheck(targets, check):
 
     with open("student_academic_performance_1M.csv", mode="r") as file:
         # Create a CSV reader object
-        bins = [[0, 0.0, 0.0, 0.0] for j in range(len(targets))]
+        bins = [[0, 0.0, 0.0, 0.0, 0.0] for j in range(len(targets))]
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             for target in range(len(targets)):
@@ -49,6 +70,7 @@ def dataCheck(targets, check):
                     bins[target][0] += 1
                     bins[target][1] += float(row["final_gpa"])
                     bins[target][2] += float(row["standardized_exam_score"])
+                    bins[target][3] += float(row["improvement_next_term"])
                     break
                 elif target == len(targets) - 1:
                     bins[target][0] += 1
@@ -63,6 +85,8 @@ def dataCheck(targets, check):
                     (bins[i][1] / bins[i][0]),
                     " and the exam scores are",
                     (bins[i][2] / bins[i][0]),
+                    "while the average improvement next term are",
+                    (bins[i][3] / bins[i][0]),
                 )
             else:
                 print("the target", targets[i], "has no members")
@@ -71,23 +95,32 @@ def dataCheck(targets, check):
 def mostImportant(checkList, check):
     if check == "final_gpa":
         targets = [4, 3.5, 3, 2.5, 2, 1, 0]
+    elif check == "top_performer_flag":
+        targets = [1, 0]
+    elif check == "improvement_next_term":
+        targets = [2, 1.5, 1, 0.5, 0, -0.5, -1.0, -1.5, -2]
     else:
         targets = [90, 80, 70, 60, 50, 40, 30, 20, 10, 0]
 
-    bins = [[0, 0.0, 0.0, 0.0, 0.0, 0.0] for j in range(len(targets))]
+    bins = [
+        [0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] for j in range(len(targets))
+    ]
 
     with open("student_academic_performance_1M.csv", mode="r") as file:
         csv_reader = csv.DictReader(file)
         n = len(targets) - 1
+        print(len(targets))
         for row in csv_reader:
-            for x in range(len(targets) + 1):
+            for x in range(len(targets)):
                 if float(row[check]) >= targets[x]:
                     n = x
                     break
 
             bins[n][0] += 1
             for x in range(len(checkList)):
-                bins[n][x + 1] += float(row[checkList[x]])
+                if checkList[x] == "illness_days":
+                    print(row[checkList[x]])
+                bins[n][x] += float(row[checkList[x]])
 
         for x in range(len(targets)):
             print(
@@ -98,7 +131,8 @@ def mostImportant(checkList, check):
                 "or more and their average values are ",
             )
             for y in range(len(checkList)):
-                bins[x][y + 1] = round(bins[x][y + 1] / bins[x][0], 2)
+                if bins[x][0] != 0:
+                    bins[x][y + 1] = round(bins[x][y + 1] / bins[x][0], 2)
                 print(checkList[y], ":", bins[x][y + 1])
 
         intake = (
