@@ -45,5 +45,3 @@ def dataCheck(target, bins, spark, df):
         .otherwise(str(bins[4]) + "+").alias(target)).avg("sleep_quality", "illness_days", "junk_food_freq").sort().show()
 
 main()
-
-    

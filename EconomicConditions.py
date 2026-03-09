@@ -7,10 +7,20 @@ import csv
 # and obviosuly your first bin will include anything smaller than it aswell
 def main():
     intake = int(
-        input("Choose which data set to analyse: \n 1. Family Income \n 2. Parent Education \n 3. Internet Access \n 4. Private Tuition \n 5. Tuition Hours (*) \n 6. Parent Involvement (*) \n 7. Financial Stress (*) \nOr enter '10' to compare averages for all of the above with different GPAs/Exam Results \n")
+        input(
+            "Choose which data set to analyse: \n 1. Family Income \n 2. Parent Education \n 3. Internet Access \n 4. Private Tuition \n 5. Tuition Hours (*) \n 6. Parent Involvement (*) \n 7. Financial Stress (*) \nOr enter '10' to compare averages for all of the above with different GPAs/Exam Results \n"
+        )
     )
     targets = [0]
-    checkList = ["family_income", "parent_education", "internet_access", "private_tuition", "tuition_hours", "parent_involvement", "financial_stress"]
+    checkList = [
+        "family_income",
+        "parent_education",
+        "internet_access",
+        "private_tuition",
+        "tuition_hours",
+        "parent_involvement",
+        "financial_stress",
+    ]
     if intake == 1:
         targets = [0.2, 0.4, 0.6, 0.8, 1]
     elif intake == 2:
@@ -59,7 +69,6 @@ def dataCheck(targets, check):
                     bins[target][0] += 1
                     bins[target][1] += float(row["final_gpa"])
                     bins[target][2] += float(row["standardized_exam_score"])
-
 
         for i in range(len(targets)):
             if bins[i][1] != 0 and bins[i][0] != 0:
