@@ -2,8 +2,7 @@ import csv
 import os
 import findspark
 
-os.environ["SPARK_HOME"] = "./spark-3.3.1-bin-hadoop3"
-os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
+os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-21-openjdk"
 findspark.init()
 
 from pyspark.sql import SparkSession
@@ -70,17 +69,13 @@ def main():
 
 
 def dataCheck(target, bins, spark, df):
-
     average = df.groupBy(
-
-        when((col(target) >= 0) & (col(target) <= bins[0]), "0-"+str(bins[0]))
-        .when((col(target) > bins[0]) & (col(target) <= bins[1]), str(bins[0])+"-"+str(bins[1]))
-        .when((col(target) > bins[1]) & (col(target) <= bins[2]), str(bins[1])+"-"+str(bins[2]))
-        .when((col(target) > bins[2]) & (col(target) <= bins[3]), str(bins[2])+"-"+str(bins[3]))
-        .when((col(target) > bins[3]) & (col(target) <= bins[4]), str(bins[3])+"-"+str(bins[4]))
-        .otherwise(str(bins[4])+"+").alias(target)
-
-    ).avg("final_gpa","standardized_exam_score").sort().show()
+        when((col(target) >= 0) & (col(target) <= bins[0]), "0-" + str(bins[0]))
+        .when((col(target) > bins[0]) & (col(target) <= bins[1]), str(bins[0]) + "-" + str(bins[1]))
+        .when((col(target) > bins[1]) & (col(target) <= bins[2]), str(bins[1]) + "-" + str(bins[2]))
+        .when((col(target) > bins[2]) & (col(target) <= bins[3]), str(bins[2]) + "-" + str(bins[3]))
+        .when((col(target) > bins[3]) & (col(target) <= bins[4]), str(bins[3]) + "-" + str(bins[4]))
+        .otherwise(str(bins[4]) + "+").alias(target)).avg("final_gpa", "standardized_exam_score","improvement_next_term").sort(target).show()
 
 
 main()

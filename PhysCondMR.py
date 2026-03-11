@@ -53,6 +53,6 @@ def dataCheck(target, bins, spark, df):
         .when((col(target) > bins[1]) & (col(target) <= bins[2]), str(bins[1]) + "-" + str(bins[2]))
         .when((col(target) > bins[2]) & (col(target) <= bins[3]), str(bins[2]) + "-" + str(bins[3]))
         .when((col(target) > bins[3]) & (col(target) <= bins[4]), str(bins[3]) + "-" + str(bins[4]))
-        .otherwise(str(bins[4]) + "+").alias(target)).avg("sleep_quality", "illness_days", "junk_food_freq").sort(target).show()
+        .otherwise(str(bins[4]) + "+").alias(target)).avg("final_gpa", "standardized_exam_score", "improvement_next_term").sort(target).show()
 
 main()
