@@ -4,7 +4,7 @@ import time
 import csv
 from pyspark.sql import SparkSession
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-21-openjdk"
-from pyspark.sql.functions import round, when, col, avg
+from pyspark.sql.functions import round, when, col, avg, col,lit,concat,count
 
 findspark.init()
 
@@ -18,15 +18,15 @@ def main():
     intake = int(input("Choose which economic factor's effect on physical conditions to analyse: \n 1. Family Income \n 2. Parent Education \n 3. Part-time Job Hours \n 4. Parent Involvement (*) \n 5. Financial Stress (*) \nOr enter '10' to compare averages for all of the above with different GPAs/Exam Results \n"))
     bins = [0]
     targetList = [
-        [4, 5, 6, 7, 8, 9],
-        [17, 19, 22, 25, 26],
-        [5, 10, 15, 20, 25, 30, 40, 50],
-        [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        [2, 4, 6, 8, 10, 12, 14, 16],
+        1,
+        2,
+        5,
+        10,
+        1,
+        1,
+        1,
+        1,
+        2,
     ]
     checkList = [
         "sleep_hours",
@@ -45,14 +45,22 @@ def main():
     print("time taken, with spark", (end - start))
 
 
-def dataCheck(target, bins, spark, df):
+def dataCheck(target, range, spark, df):
     sc = spark.sparkContext
-    average = df.groupBy(
-        when((col(target) >= 0) & (col(target) <= bins[0]), "0-"+str(bins[0]))
-        .when((col(target) > bins[0]) & (col(target) <= bins[1]), str(bins[0]) + "-" + str(bins[1]))
-        .when((col(target) > bins[1]) & (col(target) <= bins[2]), str(bins[1]) + "-" + str(bins[2]))
-        .when((col(target) > bins[2]) & (col(target) <= bins[3]), str(bins[2]) + "-" + str(bins[3]))
-        .when((col(target) > bins[3]) & (col(target) <= bins[4]), str(bins[3]) + "-" + str(bins[4]))
-        .otherwise(str(bins[4]) + "+").alias(target)).avg("final_gpa", "standardized_exam_score", "improvement_next_term").sort(target).show()
+
+    df_grouped = (
+        df.withColumn("bracket_start", (col(str(target)) / range).cast("int") * range)
+        .withColumn(str(target), concat(col("bracket_start"),lit("-"),(col("bracket_start") + range)))
+        .groupBy(str(target), "bracket_start") .avg("final_gpa", "standardized_exam_score", "improvement_next_term").orderBy("bracket_start").drop("bracket_start"))
+    df_grouped.show()
+
+    print("the difference between the last and first row with regards to gpa is: ",df_grouped.select("avg(final_gpa)").tail(1).pop(0).__getitem__("avg(final_gpa)")-df_grouped.select("avg(final_gpa)").head(1).pop(0).__getitem__("avg(final_gpa)"))
+    print("the difference between the last and first row with regards to standardized_exam_score is: ",
+          df_grouped.select("avg(standardized_exam_score)").tail(1).pop(0).__getitem__("avg(standardized_exam_score)") - df_grouped.select(
+              "avg(standardized_exam_score)").head(1).pop(0).__getitem__("avg(standardized_exam_score)"))
+    print("the difference between the last and first row with regards to improvement_next_term is: ",
+          df_grouped.select("avg(improvement_next_term)").tail(1).pop(0).__getitem__("avg(improvement_next_term)") - df_grouped.select(
+              "avg(improvement_next_term)").head(1).pop(0).__getitem__("avg(improvement_next_term)"))
+
 
 main()
