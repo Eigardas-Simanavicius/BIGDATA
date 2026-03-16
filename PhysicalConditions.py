@@ -1,5 +1,5 @@
 import csv
-
+import time
 
 # This program will take in a file, a target and the bins you want, and will find the average final gpa of them
 # your targets will be inclsive so if your bin has 25 it will be >= 25 and be put into the 25 bin
@@ -50,9 +50,11 @@ def main():
             check = "standardized_exam_score"
 
         mostImportant(checkList, check)
-        intake = 10
     else:
+        start = time.time()
         dataCheck(targetList[intake - 1], checkList[intake - 1])
+        end = time.time()
+        print("time taken, no spark", (end - start))
 
 
 def dataCheck(targets, check):

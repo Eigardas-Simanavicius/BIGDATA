@@ -1,9 +1,13 @@
 import csv
+import time
+'''
+# I don't need these
 import os
 import findspark
 os.environ["SPARK_HOME"] = "./spark-3.3.1-bin-hadoop3"
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
 findspark.init()
+'''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import round,when,col,avg
 
@@ -18,21 +22,29 @@ def main():
     spark
     df = spark.read.csv("student_academic_performance_1M.csv", header = True, mode = "DROPMALFORMED",inferSchema=True)
 
-    intake = int(input("Choose which economic factor's effect on physical conditions to analyse: \n 1. Family Income \n 2. Parent Education \n 3. Part-time Job Hours \n 4. Parent Involvement (*) \n 5. Financial Stress (*) \nOr enter '10' to compare averages for all of the above with different GPAs/Exam Results \n"))
+    intake = int(input("Choose which data set to analyse: \n 1. Family Income \n 2. Parent Education \n 3. Tuition Hours (*) \n 4. Parent Involvement (*) \n 5. Financial Stress (*) \n"))
     bins = [0]
-    if intake == 1:
-        bins = [0.2, 0.4, 0.6, 0.8, 1]
-    elif intake == 2:
-        bins = [1, 2, 3, 4, 5]
-    elif intake == 3:
-        bins = [2, 4, 6, 8, 10]
-    elif intake == 4:
-        bins = [2, 4, 6, 8, 10]
-    elif intake == 5:
-        bins = [2, 4, 6, 8, 10]
-    checkList = ["family_income", "parent_education", "part_time_job_hours", "parent_involvement", "financial_stress"]
+    checkList = [
+        "family_income",
+        "parent_education",
+        "tuition_hours",
+        "parent_involvement",
+        "financial_stress",
+    ]
+    binsList = [
+        [0.2, 0.4, 0.6, 0.8, 1],
+        [0, 1, 2, 3, 4],
+        [2, 4, 6, 8, 10],
+        [2, 4, 6, 8, 10],
+        [2, 4, 6, 8, 10]
+    ]
+    bins = binsList[intake-1]
     target = checkList[intake-1]
+    start = time.time()
     dataCheck(target, bins, spark, df)
+    end = time.time()
+    print("time taken, with spark", (end - start))
+
 
 def dataCheck(target, bins, spark, df):
     sc = spark.sparkContext
@@ -42,6 +54,6 @@ def dataCheck(target, bins, spark, df):
         .when((col(target) > bins[1]) & (col(target) <= bins[2]), str(bins[1]) + "-" + str(bins[2]))
         .when((col(target) > bins[2]) & (col(target) <= bins[3]), str(bins[2]) + "-" + str(bins[3]))
         .when((col(target) > bins[3]) & (col(target) <= bins[4]), str(bins[3]) + "-" + str(bins[4]))
-        .otherwise(str(bins[4]) + "+").alias(target)).avg("sleep_quality", "illness_days", "junk_food_freq").sort().show()
+        .otherwise(str(bins[4]) + "+").alias(target)).avg("final_gpa", "standardized_exam_score", "improvement_next_term").sort(target).show()
 
 main()
