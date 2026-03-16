@@ -8,7 +8,9 @@ import time
 def main():
     intake = int(
         input(
-            "choose which data set to analyse \n 1. sleep_hours \n 2.Age \n 3.Bmi \n 4.physical activity \n 5.Screen time \n 6.stress index \n 7.mental stree \n 8.sleep quality \n 9.illness_days \n 10. All"
+            "choose which data set to analyse \n 1. sleep_hours \n 2.Age \n 3.Bmi \n 4.physical activity "
+            "\n 5.Screen time \n 6.stress index \n 7.mental stree "
+            "\n 8.sleep quality \n 9.illness_days \n 10. All"
         )
     )
     checkList = [
@@ -33,7 +35,7 @@ def main():
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         [2, 4, 6, 8, 10, 12, 14, 16],
     ]
-
+    start = time.time()
     if intake == 10:
         intake = int(
             input(
@@ -51,11 +53,10 @@ def main():
 
         mostImportant(checkList, check)
     else:
-        start = time.time()
         dataCheck(targetList[intake - 1], checkList[intake - 1])
-        end = time.time()
-        print("time taken, no spark", (end - start))
 
+    end = time.time()
+    print("time taken, no spark", (end - start))
 
 def dataCheck(targets, check):
     # Open the CSV file in read mode
@@ -92,6 +93,7 @@ def dataCheck(targets, check):
                 )
             else:
                 print("the target", targets[i], "has no members")
+
 
 
 def mostImportant(checkList, check):
